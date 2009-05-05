@@ -22,23 +22,36 @@
 
 class FkcUser {
 
+	private $isInformationGet = false;
+
 	private $id;
 	private $fullname;
 	private $name;
 	private $familyName;
-	private $gender;
-	private $email;
-	private $bornDate;
-	private $description;
-	private $city;
-	private $country;
 	private $photo;
 
-	private $friends = null;
-	private $messages = null;
-	private $photos = null;
+	private $attFriendPage = array(
+		'gender' => '',
+		'email' => '',
+		'borndate' => '',
+		'description' => '',
+		'country' => '',
+		'residentialcountry' => '',
+		'residentialcity' => '',
+		'profession' => '',
+		'interests' => '',
+		'about' => '',
+		'favoritemovie' => '',
+		'favoriteentertainent' => '',
+		'favoritedrama' => '',
+		'favoriteplace' => '',
+		'favoritefood' => ''
+	);
 
-	function FkcUser() {
+	private $friends = array();
+
+	function FkcUser($mainUser = false) {
+		$this->isInformationGet = $mainUser;
 	}
 
 	function setId($value)
@@ -47,13 +60,33 @@ class FkcUser {
 			$this->id = $value;
 	}
 
-	/**
-	 * Attribute methods
-	 */
-
 	function getId()
 	{
 		return $this->id;
+	}
+
+	/**
+	 * Attribute methods
+	 */
+	function get($key)
+	{
+		$key = strtolower(trim($key));
+		if (array_key_exists($key, $this->attFriendPage))
+		{
+			$this->getMainPageInformation();
+			return $this->attFriendPage[$key];
+		}
+
+		return "";
+	}
+
+	function set($key, $value)
+	{
+		$key = strtolower(trim($key));
+		if (array_key_exists($key, $this->attFriendPage))
+		{
+			$this->attFriendPage[$key] = $value;
+		}
 	}
 
 	function setFullName($value)
@@ -83,68 +116,8 @@ class FkcUser {
 
 	function getFamilyName()
 	{
+		$this->getMainPageInformation();
 		return $this->familyName;
-	}
-
-	function setGender($value)
-	{
-		if (($value == "M") || ($value == "W"))
-			$this->gender = $value;
-	}
-
-	function getGender()
-	{
-		return $this->gender;
-	}
-
-	function setEmail($value)
-	{
-		// TODO: Check email
-		$this->email = $value;
-	}
-
-	function getEmail()
-	{
-		return $this->email;
-	}
-
-	function setBornDate($value) {
-		// TODO: Check date
-		$this->bornDate = $value;
-	}
-
-	function getBornDate()
-	{
-		return $this->bornDate;
-	}
-
-	function setDescription($value)
-	{
-		$this->description = $value;
-	}
-
-	function getDescription()
-	{
-		return $this->description;
-	}
-
-	function setCity($value)
-	{
-		$this->city = $value;
-	}
-	function getCity()
-	{
-		return $this->city;
-	}
-
-	function setCountry($value)
-	{
-		$this->country = $value;
-	}
-
-	function getCountry()
-	{
-		return $this->country;
 	}
 
 	function setPhoto($value) {
@@ -172,6 +145,45 @@ class FkcUser {
 	function addNewFriend($friend)
 	{
 		$this->friends[] = $friend;
+	}
+
+	private function getMainPageInformation()
+	{
+		if ($this->isInformationGet)
+			return;
+
+		$curl = new FkcCurl();
+		$mainPageHtml = $curl->post(FkcConfig :: getUrl('friend'), 'sno='.$this->id);
+		$mainPageHtml = str_replace(array("\n", "\r", "\t"),'',$mainPageHtml);
+
+		// Friend Profile Pattern
+		preg_match_all(FkcConfig :: getPattern('friendProfile'), $mainPageHtml, $profilePattern);
+		$this->set('Gender', str_replace(array("(", ")"), '', $profilePattern[3][0]));
+		$this->set('BornDate', trim($profilePattern[5][0]));
+		$this->set('Country', trim(str_replace(array("|"), '', $profilePattern[6][0])));
+		$this->set('ResidentialCountry', trim($profilePattern[9][0]));
+		$this->set('ResidentialCity', trim($profilePattern[10][0]));
+		$this->set('Profession', trim($profilePattern[13][0]));
+		$this->set('Interests', trim($profilePattern[16][0]));
+
+		// Friend Email Pattern
+		preg_match_all(FkcConfig :: getPattern('friendEmail'), $profilePattern[7][0], $emailPattern);
+		$this->set('email', trim($emailPattern[1][0]));
+
+		// Friend About Pattern
+		preg_match_all(FkcConfig :: getPattern('friendAbout'), $mainPageHtml, $aboutPattern);
+		$this->set('about', trim($aboutPattern[2][0]));
+
+		// Friend Favorites Pattern
+		preg_match_all(FkcConfig :: getPattern('friendFavorites'), $mainPageHtml, $favoritesPattern);
+		$this->set('favoriteMovie', trim($favoritesPattern[3][0]));
+		$this->set('favoriteEntertainent', trim($favoritesPattern[6][0]));
+		$this->set('favoriteDrama', trim($favoritesPattern[9][0]));
+		$this->set('favoritePlace', trim($favoritesPattern[11][0]));
+		$this->set('favoriteFood', trim($favoritesPattern[14][0]));
+
+		// Do not enter in this method again
+		$this->isInformationGet = true;
 	}
 }
 ?>

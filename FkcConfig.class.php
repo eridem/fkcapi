@@ -30,12 +30,17 @@ class FkcConfig {
 		'login' => 'http://chingu.prkorea.com/member/login_m.jsp',
 		'logout' => '',
 		'friends' => 'http://chingu.prkorea.com/mypage/friends.jsp',
+		'friend' => 'http://chingu.prkorea.com/mypage/other_main.jsp',
 		'photos' => '',
 		'photorepository' => 'http://chingu.prkorea.com/upload/new_board/'
 	);
 
 	static $patterns = array (
-		'friends' => "|<img src=\"(.*)\" width=\"80\" height=\"60\"  onmouseover=\"this.className='on'\" onmouseout=\"this.className='off'\"><br>(.*)</a></li>|U",
+		'friends' => "|goUserRead\('(.*)'\);\"><img src=\"(.*)\"(.*)><br>(.*)<|U",
+		'friendProfile' => "|<dl id=\"profile\">(.*)<dt>(.*)<span>(.*)</span></dt>(.*)<dd>(.*)<span>(.*)</span></dd>(.*)<dt>Residential Area </dt>(.*)<dd>(.*), (.*)</dd>(.*)<dt>Job</dt>(.*)<dd>(.*)</dd>(.*)<dt>Interests about  Korea</dt>(.*)<dd>(.*)</dd>(.*)</dl>|U",
+		'friendEmail' => "|<dt>Email</dt><dd><a href=\"mailto:(.*)\">(.*)</a></dd>|U",
+		'friendAbout' => "|<dt>About Yourself<dt>(.*)<dd>(.*)</dd>|U",
+		'friendFavorites' => "|<dl id=\"interests\">(.*)<dt>Favorite Korean Movie</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Entertainer</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Drama</dt>(.*)<dd>(.*)</dd><dt>Favorite Place in Korea</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Food</dt>(.*)<dd>(.*)</dd>(.*)</dl>|U",
 		'cookieId' => "|c_sno(.*)\n|U",
 		'cookieName' => "|c_first_nm(.*)\n|U",
 		'cookieFamilyName' => "|c_family_nm(.*)\n|U",

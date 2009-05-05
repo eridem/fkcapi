@@ -39,7 +39,7 @@ class Fkc {
 		// TODO: Check licence
 		// if (!licence) || (!function_exists($this->getLicence)) die();
 		$this->fkcCurl = new FkcCurl();
-		$this->user = new FkcUser();
+		$this->user = new FkcUser(true);
 	}
 
 	function login($email, $password) {
@@ -50,7 +50,7 @@ class Fkc {
 		$this->fkcCurl->get(FkcConfig :: getUrl('session'));
 
 		// Set login
-		$this->user->setEmail($email);
+		$this->user->set('Email',$email);
 		$loginHtml = $this->fkcCurl->post(FkcConfig :: getUrl('login'), 'email=' . trim(urlencode($email)) . '&password=' . trim(urlencode($password)));
 
 		// Check valid/invalid user
@@ -70,9 +70,9 @@ class Fkc {
 			$this->user->setId(trim($cookieIdPattern[1][0]));
 			$this->user->setName(trim($cookieNamePattern[1][0]));
 			$this->user->setFamilyName(trim($cookieFamilyNamePattern[1][0]));
-			$this->user->setGender(trim($cookieGenderPattern[1][0]));
-			$this->user->setCountry(trim($cookieCountryPattern[1][0]));
-			$this->user->setCity(trim($cookieCityPattern[1][0]));
+			$this->user->set('Gender',(trim($cookieGenderPattern[1][0]) == "M" ? "male" : "female" ));
+			$this->user->set('Country',trim($cookieCountryPattern[1][0]));
+			$this->user->set('ResidentialCountry',trim($cookieCityPattern[1][0]));
 			$this->user->setPhoto(FkcConfig::getUrl('photorepository') . trim($cookiePhotoPattern[1][0]));
 
 			$this->login = true;
@@ -93,11 +93,14 @@ class Fkc {
 		$this->user->setFriends(array ());
 		$friendsHtml = $this->fkcCurl->get(FkcConfig :: getUrl('friends'));
 
-		preg_match_all(FkcConfig :: getPattern('friends'), $friendsHtml, $friendsPattern, PREG_PATTERN_ORDER);
+		preg_match_all(FkcConfig :: getPattern('friends'), $friendsHtml, $friendsPattern);
+		//var_dump($friendsPattern);
+
 		for ($i = 0; $i < count($friendsPattern[1]); $i++) {
 			$newFriend = new FkcUser();
-			$newFriend->setPhoto(utf8_encode(html_entity_decode(FkcConfig :: getUrl('main') . $friendsPattern[1][$i])));
-			$newFriend->setFullName(utf8_encode(html_entity_decode($friendsPattern[2][$i])));
+			$newFriend->setId((int)utf8_encode(html_entity_decode($friendsPattern[1][$i])));
+			$newFriend->setPhoto(utf8_encode(html_entity_decode(FkcConfig :: getUrl('main') . $friendsPattern[2][$i])));
+			$newFriend->setFullName(utf8_encode(html_entity_decode($friendsPattern[4][$i])));
 			$this->user->addNewFriend($newFriend);
 		}
 
