@@ -22,22 +22,23 @@
 
 class FkcUser {
 
-	private $isInformationGet = false;
-
-	private $id;
-	private $fullname;
-	private $name;
-	private $familyName;
-	private $photo;
-
-	private $attFriendPage = array(
-		'gender' => '',
+	private $isCookieInformationGet = false;
+	private $attCookie = array(
+		'id' => '',
+		'name' => '',
+		'familyname' => '',
 		'email' => '',
-		'borndate' => '',
-		'description' => '',
+		'photo' => '',
+		'gender' => '',
 		'country' => '',
 		'residentialcountry' => '',
 		'residentialcity' => '',
+	);
+
+	private $isProfilePageInformationGet = false;
+	private $attProfile = array(
+		'borndate' => '',
+		'description' => '',
 		'profession' => '',
 		'interests' => '',
 		'about' => '',
@@ -48,33 +49,33 @@ class FkcUser {
 		'favoritefood' => ''
 	);
 
-	private $friends = array();
+	private $isFriendsPageInformationGet = false;
+	private $attFriends = array('friends' => '');
 
-	function FkcUser($mainUser = false) {
-		$this->isInformationGet = $mainUser;
-	}
-
-	function setId($value)
-	{
-		if (is_int($value))
-			$this->id = $value;
-	}
-
-	function getId()
-	{
-		return $this->id;
+	function FkcUser() {
 	}
 
 	/**
 	 * Attribute methods
 	 */
-	function get($key)
+	function get($key, $force = false)
 	{
 		$key = strtolower(trim($key));
-		if (array_key_exists($key, $this->attFriendPage))
+
+		if (array_key_exists($key, $this->attCookie))
 		{
-			$this->getMainPageInformation();
-			return $this->attFriendPage[$key];
+			$this->getCookieInformation($force);
+			return $this->attCookie[$key];
+		}
+		else if (array_key_exists($key, $this->attProfile))
+		{
+			$this->getProfilePageInformation($force);
+			return $this->attProfile[$key];
+		}
+		else if (array_key_exists($key, $this->attFriends))
+		{
+			$this->getFriendsInformation($force);
+			return $this->attFriends[$key];
 		}
 
 		return "";
@@ -83,107 +84,79 @@ class FkcUser {
 	function set($key, $value)
 	{
 		$key = strtolower(trim($key));
-		if (array_key_exists($key, $this->attFriendPage))
+		if (array_key_exists($key, $this->attProfile))
 		{
-			$this->attFriendPage[$key] = $value;
+			$this->attProfile[$key] = $value;
+		}
+		else if (array_key_exists($key, $this->attCookie))
+		{
+			$this->attCookies[$key] = $value;
+		}
+		else if (array_key_exists($key, $this->attFriends))
+		{
+			$this->attFriends[$key] = $value;
 		}
 	}
 
-	function setFullName($value)
+	private function getCookieInformation($force = false)
 	{
-		$this->fullname = $value;
+		if ($this->isCookieInformationGet && !$force)
+			return;
+
+		$fh = fopen(FkcConfig::getCookie(), 'r');
+		$cookieInformation = fread($fh, filesize(FkcConfig::getCookie()));
+		fclose($fh);
+		preg_match_all(FkcConfig::getPattern('cookieId'), $cookieInformation, $cookieIdPattern, PREG_PATTERN_ORDER);
+		preg_match_all(FkcConfig::getPattern('cookieName'), $cookieInformation, $cookieNamePattern, PREG_PATTERN_ORDER);
+		preg_match_all(FkcConfig::getPattern('cookieFamilyName'), $cookieInformation, $cookieFamilyNamePattern, PREG_PATTERN_ORDER);
+		preg_match_all(FkcConfig::getPattern('cookieGender'), $cookieInformation, $cookieGenderPattern, PREG_PATTERN_ORDER);
+		preg_match_all(FkcConfig::getPattern('cookieCountry'), $cookieInformation, $cookieCountryPattern, PREG_PATTERN_ORDER);
+		preg_match_all(FkcConfig::getPattern('cookieResidentialCountry'), $cookieInformation, $cookieResidentialCountryPattern, PREG_PATTERN_ORDER);
+		preg_match_all(FkcConfig::getPattern('cookieResidentialCity'), $cookieInformation, $cookieResidentialCityPattern, PREG_PATTERN_ORDER);
+		preg_match_all(FkcConfig::getPattern('cookiePhoto'), $cookieInformation, $cookiePhotoPattern, PREG_PATTERN_ORDER);
+		$this->attCookie['id'] = trim($cookieIdPattern[1][0]);
+		$this->attCookie['name'] = trim($cookieNamePattern[1][0]);
+		$this->attCookie['familyname'] = trim($cookieFamilyNamePattern[1][0]);
+		$this->attCookie['gender'] = (trim($cookieGenderPattern[1][0]) == "M" ? "male" : "female" );
+		$this->attCookie['country'] = trim($cookieCountryPattern[1][0]);
+		$this->attCookie['residentialcountry'] = trim($cookieResidentialCountryPattern[1][0]);
+		$this->attCookie['residentialcity'] = trim($cookieResidentialCityPattern[1][0]);
+		$this->attCookie['photo'] = FkcConfig::getUrl('photorepository') . trim($cookiePhotoPattern[1][0]);
+
+		// Do not enter in this method again
+		$this->isCookieInformationGet = true;
 	}
 
-	function getFullName()
+	private function getFriendsInformation($force = false)
 	{
-		return $this->fullname;
-	}
-
-	function setName($value)
-	{
-		$this->name = $value;
-	}
-
-	function getName()
-	{
-		return $this->name;
-	}
-
-	function setFamilyName($value)
-	{
-		$this->familyName = $value;
-	}
-
-	function getFamilyName()
-	{
-		$this->getMainPageInformation();
-		return $this->familyName;
-	}
-
-	function setPhoto($value) {
-		$this->photo = $value;
-	}
-
-	function getPhoto(){
-		return $this->photo;
-	}
-
-	function setFriends($value)
-	{
-		if (is_array($value))
-			$this->friends = $value;
-	}
-
-	function getFriends()
-	{
-		return $this->friends;
-	}
-
-	/**
-	 * Add a new friend.
-	 */
-	function addNewFriend($friend)
-	{
-		$this->friends[] = $friend;
-	}
-
-	private function getMainPageInformation()
-	{
-		if ($this->isInformationGet)
+		if ($this->isFriendsPageInformationGet && !$force)
 			return;
 
 		$curl = new FkcCurl();
-		$mainPageHtml = $curl->post(FkcConfig :: getUrl('friend'), 'sno='.$this->id);
-		$mainPageHtml = str_replace(array("\n", "\r", "\t"),'',$mainPageHtml);
+		$this->attFriends["friends"] = array();
+		$friendsHtml = $curl->get(FkcConfig :: getUrl('friends'));
 
-		// Friend Profile Pattern
-		preg_match_all(FkcConfig :: getPattern('friendProfile'), $mainPageHtml, $profilePattern);
-		$this->set('Gender', str_replace(array("(", ")"), '', $profilePattern[3][0]));
-		$this->set('BornDate', trim($profilePattern[5][0]));
-		$this->set('Country', trim(str_replace(array("|"), '', $profilePattern[6][0])));
-		$this->set('ResidentialCountry', trim($profilePattern[9][0]));
-		$this->set('ResidentialCity', trim($profilePattern[10][0]));
-		$this->set('Profession', trim($profilePattern[13][0]));
-		$this->set('Interests', trim($profilePattern[16][0]));
+		preg_match_all(FkcConfig :: getPattern('friends'), $friendsHtml, $friendsPattern);
 
-		// Friend Email Pattern
-		preg_match_all(FkcConfig :: getPattern('friendEmail'), $profilePattern[7][0], $emailPattern);
-		$this->set('email', trim($emailPattern[1][0]));
+		for ($i = 0; $i < count($friendsPattern[1]); $i++) {
+			$newFriend = new FkcFriend();
+			$newFriend->set('id', ((int)utf8_encode(html_entity_decode($friendsPattern[1][$i]))));
+			$newFriend->set('photo', (utf8_encode(html_entity_decode(FkcConfig :: getUrl('main') . $friendsPattern[2][$i]))));
 
-		// Friend About Pattern
-		preg_match_all(FkcConfig :: getPattern('friendAbout'), $mainPageHtml, $aboutPattern);
-		$this->set('about', trim($aboutPattern[2][0]));
+			$fullNames = split(' ', utf8_encode(html_entity_decode($friendsPattern[4][$i])));
+			$newFriend->set('name', $fullNames[0]);
+			$familyName = "";
+			for ($j = 1; $j < count($fullNames); $j++)
+			{
+				$familyName .= $fullNames[1] . " ";
+			}
+			$newFriend->set('familyName', trim($familyName));
 
-		// Friend Favorites Pattern
-		preg_match_all(FkcConfig :: getPattern('friendFavorites'), $mainPageHtml, $favoritesPattern);
-		$this->set('favoriteMovie', trim($favoritesPattern[3][0]));
-		$this->set('favoriteEntertainent', trim($favoritesPattern[6][0]));
-		$this->set('favoriteDrama', trim($favoritesPattern[9][0]));
-		$this->set('favoritePlace', trim($favoritesPattern[11][0]));
-		$this->set('favoriteFood', trim($favoritesPattern[14][0]));
+			$this->attFriends["friends"][] = $newFriend;
+		}
 
 		// Do not enter in this method again
-		$this->isInformationGet = true;
+		$this->isFriendsPageInformationGet = true;
 	}
 }
 ?>
