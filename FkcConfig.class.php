@@ -37,6 +37,7 @@ class FkcConfig {
 
 	static $patterns = array (
 		'friends' => "|goUserRead\('(.*)'\);\"><img src=\"(.*)\"(.*)><br>(.*)<|U",
+		'friendPhoto' => "|<a href=\"javascript:view\('(.*)'\);\"><img src|U",
 		'friendProfile' => "|<dl id=\"profile\">(.*)<dt>(.*)<span>(.*)</span></dt>(.*)<dd>(.*)<span>(.*)</span></dd>(.*)<dt>Residential Area </dt>(.*)<dd>(.*), (.*)</dd>(.*)<dt>Job</dt>(.*)<dd>(.*)</dd>(.*)<dt>Interests about  Korea</dt>(.*)<dd>(.*)</dd>(.*)</dl>|U",
 		'friendEmail' => "|<dt>Email</dt><dd><a href=\"mailto:(.*)\">(.*)</a></dd>|U",
 		'friendAbout' => "|<dt>About Yourself<dt>(.*)<dd>(.*)</dd>|U",
@@ -46,7 +47,8 @@ class FkcConfig {
 		'cookieFamilyName' => "|c_family_nm(.*)\n|U",
 		'cookieGender' => "|c_gender(.*)\n|U",
 		'cookieCountry' => "|c_country(.*)\n|U",
-		'cookieCity' => "|c_resi_area1(.*)\n|U",
+		'cookieResidentialCountry' => "|c_resi_area1(.*)\n|U",
+		'cookieResidentialCity' => "|c_resi_area2(.*)\n|U",
 		'cookiePhoto' => "|c_photo(.*)\n|U"
 	);
 
