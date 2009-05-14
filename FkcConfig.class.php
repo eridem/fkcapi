@@ -23,26 +23,30 @@
 class FkcConfig {
 	static $debug = true;
 	static $cookiefile = '/tmp/fkc_cookie';
+	static $notPhoto = '/img/common/profile.gif';
+	static $photoBlank = '/img/common/no.gif';
 
 	static $urls = array (
 		'main' => 'http://chingu.prkorea.com/',
 		'session' => 'http://chingu.prkorea.com/member/login.jsp',
 		'login' => 'http://chingu.prkorea.com/member/login_m.jsp',
 		'logout' => '',
+		'profile' => 'http://chingu.prkorea.com/mypage/main.jsp',
 		'friends' => 'http://chingu.prkorea.com/mypage/friends.jsp',
 		'friend' => 'http://chingu.prkorea.com/mypage/other_main.jsp',
 		'photos' => '',
-		'photorepository' => 'http://chingu.prkorea.com/upload/new_board/'
+		'photorepository' => 'http://chingu.prkorea.com//upload/new_board/'
 	);
 
 	static $patterns = array (
 		'friends' => "|goUserRead\('(.*)'\);\"><img src=\"(.*)\"(.*)><br>(.*)<|U",
-		'friendPhoto' => "|<a href=\"javascript:view\('(.*)'\);\"><img src|U",
+		'friendPhoto' => "|<a href=\"javascript:view\('(.*)'\);\"><img src=\"(.*)\" w|U",
 		'friendProfile' => "|<dl id=\"profile\">(.*)<dt>(.*)<span>(.*)</span></dt>(.*)<dd>(.*)<span>(.*)</span></dd>(.*)<dt>Residential Area </dt>(.*)<dd>(.*), (.*)</dd>(.*)<dt>Job</dt>(.*)<dd>(.*)</dd>(.*)<dt>Interests about  Korea</dt>(.*)<dd>(.*)</dd>(.*)</dl>|U",
 		'friendEmail' => "|<dt>Email</dt><dd><a href=\"mailto:(.*)\">(.*)</a></dd>|U",
-		'friendAbout' => "|<dt>About Yourself<dt>(.*)<dd>(.*)</dd>|U",
+		'friendAbout' => "|<dt>About Yourself(.*)<dd>(.*)</dd>|U",
 		'friendFavorites' => "|<dl id=\"interests\">(.*)<dt>Favorite Korean Movie</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Entertainer</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Drama</dt>(.*)<dd>(.*)</dd><dt>Favorite Place in Korea</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Food</dt>(.*)<dd>(.*)</dd>(.*)</dl>|U",
 		'cookieId' => "|c_sno(.*)\n|U",
+		'cookieEmail' => "|c_email(.*)\n|U",
 		'cookieName' => "|c_first_nm(.*)\n|U",
 		'cookieFamilyName' => "|c_family_nm(.*)\n|U",
 		'cookieGender' => "|c_gender(.*)\n|U",
@@ -69,6 +73,14 @@ class FkcConfig {
 	static function getCookie()
 	{
 		return self :: $cookiefile;
+	}
+
+	static function getNoPhoto() {
+		return self :: $notPhoto;
+	}
+
+	static function getPhotoBlank() {
+		return self :: $photoBlank;
 	}
 }
 ?>
