@@ -139,7 +139,8 @@ class FkcFriend {
 
 		// Friend Photo Pattern
 		preg_match_all(FkcConfig :: getPattern('friendPhoto'), $mainPageHtml, $photoPattern);
-		$this->attBasic['photo'] = FkcConfig :: getUrl('photorepository') . trim($photoPattern[1][0]);
+		$photo = trim($photoPattern[2][0]);
+		$this->attBasic['photo'] = FkcConfig :: getUrl('main') . ($photo == "" ? FkcConfig :: getNoPhoto() : $photo);
 
 		// Friend Profile Pattern
 		preg_match_all(FkcConfig :: getPattern('friendProfile'), $mainPageHtml, $profilePattern);
