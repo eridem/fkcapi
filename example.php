@@ -42,7 +42,7 @@ $friends = $user->get('Friends');
 				</table>
 			</td>
 		</table>
-		<h2>Friends</h2>
+<?/*		<h2>Friends</h2>
 		<table width="100%" border="1">
 			<tr><td width="30%">Information</td><td width="70%">Photo</td></tr>
 			<?php foreach ($friends as $friend) : ?>
@@ -71,7 +71,7 @@ $friends = $user->get('Friends');
 				<td width="30%"><img src="<?php echo $friend->get('Photo'); ?>" width="200"></td>
 			</tr>
 			<?php endforeach; ?>
-		</table>
+		</table>*/?>
 		<p><? echo html_entity_decode($fkc->getHtmlLicence()); ?></p>
 	</body>
 </html>
