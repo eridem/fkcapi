@@ -20,26 +20,26 @@
     http://eridem.net/friendly-korea-community-api/
 */
 
-class FkcFriend extends FkcUser{
+class FkcMe extends FkcUser {
 
-	private $isBasicInformationGet = false;
-	private $attBasic = array(
+	private $isCookieInformationGet = false;
+	private $attCookie = array(
 		'id' => '',
 		'name' => '',
 		'familyname' => '',
-		'photo' => ''
+		'email' => '',
+		'photo' => '',
+		'gender' => '',
+		'country' => '',
+		'residentialcountry' => '',
+		'residentialcity' => '',
 	);
 
 	private $isProfilePageInformationGet = false;
 	private $attProfile = array(
 		'friends' => '',
-		'gender' => '',
-		'email' => '',
 		'borndate' => '',
 		'description' => '',
-		'country' => '',
-		'residentialcountry' => '',
-		'residentialcity' => '',
 		'profession' => '',
 		'interests' => '',
 		'about' => '',
@@ -57,10 +57,10 @@ class FkcFriend extends FkcUser{
 	{
 		$key = strtolower(trim($key));
 
-		if (array_key_exists($key, $this->attBasic))
+		if (array_key_exists($key, $this->attCookie))
 		{
-			$this->getBasicInformation($force);
-			return $this->attBasic[$key];
+			$this->getCookieInformation($force);
+			return $this->attCookie[$key];
 		}
 		else if (array_key_exists($key, $this->attProfile))
 		{
@@ -74,13 +74,13 @@ class FkcFriend extends FkcUser{
 	function set($key, $value)
 	{
 		$key = strtolower(trim($key));
-		if (array_key_exists($key, $this->attBasic))
-		{
-			$this->attBasic[$key] = $value;
-		}
-		else if (array_key_exists($key, $this->attProfile))
+		if (array_key_exists($key, $this->attProfile))
 		{
 			$this->attProfile[$key] = $value;
+		}
+		else if (array_key_exists($key, $this->attCookie))
+		{
+			$this->attCookies[$key] = $value;
 		}
 		else if (array_key_exists($key, $this->attFriends))
 		{
@@ -88,32 +88,25 @@ class FkcFriend extends FkcUser{
 		}
 	}
 
-	protected function getBasicInformation($force = false)
+	protected function getCookieInformation($force = false)
 	{
-		$isNeedGetBasic = false;
-		foreach ($this->attBasic as $key=>$value)
-		{
-			$isNeedGetBasic = $isNeedGetBasic || ($value == '');
-		}
-
-		if ($isNeedGetBasic && $this->attBasic['id'] != '')
-		{
-			$this->getProfilePageInformation();
+		if ($this->isCookieInformationGet && !$force)
 			return;
-		}
 
-		if (!$isNeedGetBasic)
-			$this->isBasicInformationGet = true;
+		parent::getCookieInformation();
 
-		if ($this->isBasicInformationGet && !$force)
-		{
-			return;
-		}
+		$this->attCookie['id'] = $this->atts['id'];
+		$this->attCookie['email'] = $this->atts['email'];
+		$this->attCookie['name'] = $this->atts['name'];
+		$this->attCookie['familyname'] = $this->atts['familyname'];
+		$this->attCookie['gender'] = $this->atts['gender'];
+		$this->attCookie['country'] = $this->atts['country'];
+		$this->attCookie['residentialcountry'] = $this->atts['residentialcountry'];
+		$this->attCookie['residentialcity'] = $this->atts['residentialcity'];
+		$this->attCookie['photo'] = $this->atts['photo'];
 
-		if ($this->attBasic['id'] != '')
-		{
-			$this->getProfilePageInformation();
-		}
+		// Do not enter in this method again
+		$this->isCookieInformationGet = true;
 	}
 
 	protected function getProfilePageInformation($force = false)
@@ -121,9 +114,8 @@ class FkcFriend extends FkcUser{
 		if ($this->isProfilePageInformationGet && !$force)
 			return;
 
-		parent::getProfilePageInformation(FkcConfig :: getUrl('friend') . "?sno=" . $this->attBasic['id']);
+		parent::getProfilePageInformation(FkcConfig :: getUrl('profile'));
 
-		$this->attProfile['email'] = $this->atts['email'];
 		$this->attProfile['friends'] = $this->atts['friends'];
 		$this->attProfile['gender'] = $this->atts['gender'];
 		$this->attProfile['borndate'] = $this->atts['borndate'];
@@ -141,7 +133,6 @@ class FkcFriend extends FkcUser{
 
 		// Do not enter in this method again
 		$this->isProfilePageInformationGet = true;
-		$this->isBasicInformationGet = true;
 	}
 }
 ?>

@@ -21,9 +21,11 @@
 */
 
 include_once ("FkcUser.class.php");
+include_once ("FkcMe.class.php");
 include_once ("FkcFriend.class.php");
 include_once ("FkcCurl.class.php");
 include_once ("FkcConfig.class.php");
+include_once ("FkcSecurity.class.php");
 
 class Fkc {
 
@@ -38,7 +40,7 @@ class Fkc {
 
 	function Fkc() {
 		$this->fkcCurl = new FkcCurl();
-		$this->user = new FkcUser(true);
+		$this->user = new FkcMe();
 	}
 
 	function login($email, $password) {
