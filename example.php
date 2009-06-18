@@ -2,14 +2,17 @@
 include_once('Fkc.class.php');
 
 // Login settings
-$email = '[YOUR_EMAIL_HERE]';
-$password = '[YOUR_PASS_HERE]';
+$email = 'eridem@gmail.com';
+$password = 'v';
 
 // Creating a new instance of FKC API, logining and getting friends.
 $fkc = new Fkc();
 $fkc->login($email, $password);
 $user = $fkc->getUser();
 $friends = $user->get('Friends');
+$guestbook = $user->get('Guestbook');
+$photos = $user->get('photos');
+
 ?>
 
 <html>
@@ -42,12 +45,26 @@ $friends = $user->get('Friends');
 				</table>
 			</td>
 		</table>
-<?/*		<h2>Friends</h2>
+
+<table width="100%" border="1">
+<?php foreach ($guestbook as $message) : ?>
+<tr><td width="20%"><?php echo $message->getUserId(); ?></td><td width="20%"><?php echo $message->getDate(); ?></td><td width="60%"><?php echo $message->getText(); ?></td></tr>
+<?php endforeach; ?>
+</table>
+
+<table width="100%" border="1">
+<?php foreach ($photos as $photo) : ?>
+<tr><td><img src="<?php echo $photo->getPhotoUrl();?>" width="50" /><br /><div align="center"><?php echo $photo->getDate(); ?></div></td></tr>
+<?php endforeach; ?>
+</table>
+
+		<h2>Friends</h2>
 		<table width="100%" border="1">
 			<tr><td width="30%">Information</td><td width="70%">Photo</td></tr>
-			<?php foreach ($friends as $friend) : ?>
+			<?php $friend = $friends[0]; ?>
+			<?php //foreach ($friends as $friend) : ?>
 			<tr>
-				<td width="30%" valign="top">
+				<td width="70%" valign="top">
 				<table width="100%" border="0">
 					<tr><td width="35%"><b>Id:</b></td><td><?php echo $friend->get('Id'); ?></td></tr>
 					<tr><td width="35%"><b>Name:</b></td><td><?php echo $friend->get('Name'); ?></td></tr>
@@ -66,12 +83,21 @@ $friends = $user->get('Friends');
 					<tr><td width="35%"><b>Favorite Drama:</b></td><td><?php echo $friend->get('FavoriteDrama'); ?></td></tr>
 					<tr><td width="35%"><b>Favorite Place:</b></td><td><?php echo $friend->get('FavoritePlace'); ?></td></tr>
 					<tr><td width="35%"><b>Favorite Food:</b></td><td><?php echo $friend->get('FavoriteFood'); ?></td></tr>
+					<tr><td width="35%"><b>Guestbook:</b></td><td>
+						<table width="100%" border="1">
+						<?php
+						$guestbook = $friend->get('Guestbook');
+						foreach ($guestbook as $message) : ?>
+						<tr><td width="20%"><?php echo $message->getUserId(); ?></td><td width="20%"><?php echo $message->getDate(); ?></td><td width="60%"><?php echo $message->getText(); ?></td></tr>
+						<?php endforeach; ?>
+						</table>
+					</td></tr>
 				</table>
 				</td>
 				<td width="30%"><img src="<?php echo $friend->get('Photo'); ?>" width="200"></td>
 			</tr>
-			<?php endforeach; ?>
-		</table>*/?>
+			<?php// endforeach; ?>
+		</table>
 		<p><? echo html_entity_decode($fkc->getHtmlLicence()); ?></p>
 	</body>
 </html>

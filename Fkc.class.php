@@ -23,6 +23,8 @@
 include_once ("FkcUser.class.php");
 include_once ("FkcMe.class.php");
 include_once ("FkcFriend.class.php");
+include_once ("FkcGuestbookMessage.class.php");
+include_once ("FkcPhoto.class.php");
 include_once ("FkcCurl.class.php");
 include_once ("FkcConfig.class.php");
 include_once ("FkcSecurity.class.php");
@@ -40,7 +42,7 @@ class Fkc {
 
 	function Fkc() {
 		$this->fkcCurl = new FkcCurl();
-		$this->user = new FkcMe();
+		$this->user = null;
 	}
 
 	function login($email, $password) {
@@ -51,12 +53,15 @@ class Fkc {
 		$this->fkcCurl->get(FkcConfig :: getUrl('session'));
 
 		// Set login
-		$this->user->set('Email',$email);
 		$loginHtml = $this->fkcCurl->post(FkcConfig :: getUrl('login'), 'email=' . trim(urlencode($email)) . '&password=' . trim(urlencode($password)));
 
 		// Check valid/invalid user
 		if (!strstr($loginHtml, "incorrected ID or password"))
+		{
+			$this->user = new FkcMe();
+			$this->user->set('Email',$email);
 			$this->login = true;
+		}
 		else
 			$this->login = false;
 
