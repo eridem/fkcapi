@@ -118,5 +118,80 @@ abstract class FkcUser {
 		$this->atts['favoriteplace'] = FkcSecurity:: HtmlInjection($favoritesPattern[11][0]);
 		$this->atts['favoritefood'] = FkcSecurity:: HtmlInjection($favoritesPattern[14][0]);
 	}
+
+	protected function getPhotoPageInformation($url, $id = '')
+	{
+		$curl = new FkcCurl();
+		$this->atts['photos'] = array();
+		if ($id == '')
+			$photosPageHtml = str_replace(array("\n", "\r", "\t"), '', $curl->get($url));
+		else
+		{
+			$post = "";
+			$photosPageHtml = "TODO";
+		}
+
+		// Message Pattern
+		preg_match_all(FkcConfig :: getPattern('friendPhotos'), $photosPageHtml, $photoPattern);
+
+		for ($i = 0; $i < count($photoPattern[1]); $i++)
+		{
+			$text = ''; // TODO
+			$date = FkcSecurity:: HtmlInjection($photoPattern[6][$i]);
+			$photoUrl = FkcConfig :: getUrl('main') . FkcSecurity:: HtmlInjection($photoPattern[2][$i]);
+			$user = $id;
+			$photo = new FkcPhoto($text, $date, $photoUrl, $user);
+			$this->atts['photos'][] = $photo;
+		}
+	}
+
+	protected function getGuestbookPageInformation($url, $id = '', $email = '', $name = '')
+	{
+		$curl = new FkcCurl();
+		$this->atts['guestbook'] = array();
+		if ($id == '')
+			$guestbookPageHtml = str_replace(array("\n", "\r", "\t"),'',$curl->get($url));
+		else
+		{
+			$post = "owner_sno=".$id."&pageno=1";
+			$guestbookPageHtml = str_replace(array("\n", "\r", "\t"),'',$curl->post($url, $post));
+		}
+
+		// Message Pattern
+		preg_match_all(FkcConfig :: getPattern('friendGuestbook'), $guestbookPageHtml, $messagePattern);
+
+		for ($i = 0; $i < count($messagePattern[1]); $i++) {
+			$m_user = FkcSecurity:: HtmlInjection($messagePattern[2][$i]);
+			$m_date = FkcSecurity:: HtmlInjection($messagePattern[5][$i]);
+			$m_text = FkcSecurity:: HtmlInjection($messagePattern[7][$i]);
+			$message = new FkcGuestbookMessage($m_text, $m_date, $m_user);
+			$this->atts['guestbook'][] = $message;
+		}
+
+		// Number Pages Pattern
+		preg_match_all(FkcConfig :: getPattern('friendGuestbookPages'), $guestbookPageHtml, $pageNoPattern);
+		for ($j = 0; $j < count($pageNoPattern[1]); $j++)
+		{
+			if ($id == '')
+				$post = "pageno=" . $pageNoPattern[1][$j];
+			else
+			{
+				$post = "owner_sno=".$id."&pageno=".$pageNoPattern[1][$j];
+				$guestbookPageHtml = str_replace(array("\n", "\r", "\t"),'',$curl->post($url, $post));
+			}
+
+			$guestbookPageHtml = str_replace(array("\n", "\r", "\t"),'',$curl->post($url, $post));
+			// Message Pattern
+			preg_match_all(FkcConfig :: getPattern('friendGuestbook'), $guestbookPageHtml, $messagePattern);
+
+			for ($i = 0; $i < count($messagePattern[1]); $i++) {
+				$m_user = FkcSecurity:: HtmlInjection($messagePattern[2][$i]);
+				$m_date = FkcSecurity:: HtmlInjection($messagePattern[5][$i]);
+				$m_text = FkcSecurity:: HtmlInjection($messagePattern[7][$i]);
+				$message = new FkcGuestbookMessage($m_text, $m_date, $m_user);
+				$this->atts['guestbook'][] = $message;
+			}
+		}
+	}
 }
 ?>

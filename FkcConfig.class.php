@@ -26,6 +26,9 @@ class FkcConfig {
 	static $notPhoto = '/img/common/profile.gif';
 	static $photoBlank = '/img/common/no.gif';
 
+	// TODO: Skip several TAGS when you do Html Injection
+	//static $allowHtmlTags = array('br', 'img', 'b', 'em', 'i', 'p');
+
 	static $urls = array (
 		'main' => 'http://chingu.prkorea.com/',
 		'session' => 'http://chingu.prkorea.com/member/login.jsp',
@@ -34,7 +37,9 @@ class FkcConfig {
 		'profile' => 'http://chingu.prkorea.com/mypage/main.jsp',
 		'friends' => 'http://chingu.prkorea.com/mypage/friends.jsp',
 		'friend' => 'http://chingu.prkorea.com/mypage/other_main.jsp',
-		'photos' => '',
+		'photos' => 'http://chingu.prkorea.com/mypage/photos.jsp',
+		'friendguestbook' => 'http://chingu.prkorea.com/mypage/other_guestbook.jsp',
+		'guestbook' => 'http://chingu.prkorea.com/mypage/guestbook.jsp',
 		'photorepository' => 'http://chingu.prkorea.com//upload/new_board/'
 	);
 
@@ -45,6 +50,9 @@ class FkcConfig {
 		'friendEmail' => "|<dt>Email</dt><dd><a href=\"mailto:(.*)\">(.*)</a></dd>|U",
 		'friendAbout' => "|<dt>About Yourself(.*)<dd>(.*)</dd>|U",
 		'friendFavorites' => "|<dl id=\"interests\">(.*)<dt>Favorite Korean Movie</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Entertainer</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Drama</dt>(.*)<dd>(.*)</dd><dt>Favorite Place in Korea</dt>(.*)<dd>(.*)</dd>(.*)<dt>Favorite Korean Food</dt>(.*)<dd>(.*)</dd>(.*)</dl>|U",
+		'friendGuestbook' => "|goUserRead\('(.*)'\);\">(.*)</a>(.*)</th>(.*)<td>(.*)</td>(.*)<td colspan=\"4\" class=\"bline\">(.*)</td>|U",
+		'friendGuestbookPages' => "|<li><a href=\"javascript:goPage\('(.*)'\)\">(.*)</a></li>|U",
+		'friendPhotos' => "|goRead\('(.*)'\)\"><img src=\"(.*)\"(.*)<br>(.*)<br><span>(.*)<br>(.*)</span></li>|U",
 		'cookieId' => "|c_sno(.*)\n|U",
 		'cookieEmail' => "|c_email(.*)\n|U",
 		'cookieName' => "|c_first_nm(.*)\n|U",

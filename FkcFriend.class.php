@@ -50,6 +50,10 @@ class FkcFriend extends FkcUser{
 		'favoritefood' => ''
 	);
 
+	private $idGuestbookInformationGet = false;
+	private $attGuestbook = array(
+		'guestbook' => array());
+
 	/**
 	 * Attribute methods
 	 */
@@ -66,6 +70,11 @@ class FkcFriend extends FkcUser{
 		{
 			$this->getProfilePageInformation($force);
 			return $this->attProfile[$key];
+		}
+		else if (array_key_exists($key, $this->attGuestbook))
+		{
+			$this->getGuestbookPageInformation($force);
+			return $this->attGuestbook[$key];
 		}
 
 		return "";
@@ -85,6 +94,10 @@ class FkcFriend extends FkcUser{
 		else if (array_key_exists($key, $this->attFriends))
 		{
 			$this->attFriends[$key] = $value;
+		}
+		else if (array_key_exists($key, $this->attGuestbook))
+		{
+			$this->attGuestbook[$key] = $value;
 		}
 	}
 
@@ -142,6 +155,19 @@ class FkcFriend extends FkcUser{
 		// Do not enter in this method again
 		$this->isProfilePageInformationGet = true;
 		$this->isBasicInformationGet = true;
+	}
+
+	protected function getGuestbookPageInformation($force = false)
+	{
+		if ($this->isGuestbookPageInformationGet && !$force)
+			return;
+
+		parent::getGuestbookPageInformation(FkcConfig :: getUrl('friendguestbook'), $this->get('id'), $this->get('email'), $this->get('name') + " "+ $this->get('familyname'));
+
+		$this->attGuestbook['guestbook'] = $this->atts['guestbook'];
+
+		// Do not enter in this method again
+		$this->isGuestbookPageInformationGet = true;
 	}
 }
 ?>

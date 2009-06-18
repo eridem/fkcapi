@@ -50,6 +50,14 @@ class FkcMe extends FkcUser {
 		'favoritefood' => ''
 	);
 
+	private $isGuestbookInformationGet = false;
+	private $attGuestbook = array(
+		'guestbook' => array());
+
+	private $isPhotosInformationGet = false;
+	private $attPhotos = array(
+		'photos' => array());
+
 	/**
 	 * Attribute methods
 	 */
@@ -66,6 +74,16 @@ class FkcMe extends FkcUser {
 		{
 			$this->getProfilePageInformation($force);
 			return $this->attProfile[$key];
+		}
+		else if (array_key_exists($key, $this->attGuestbook))
+		{
+			$this->getGuestbookPageInformation($force);
+			return $this->attGuestbook[$key];
+		}
+		else if (array_key_exists($key, $this->attPhotos))
+		{
+			$this->getPhotoPageInformation($force);
+			return $this->attPhotos[$key];
 		}
 
 		return "";
@@ -85,6 +103,14 @@ class FkcMe extends FkcUser {
 		else if (array_key_exists($key, $this->attFriends))
 		{
 			$this->attFriends[$key] = $value;
+		}
+		else if (array_key_exists($key, $this->attGuestbook))
+		{
+			$this->attGuestbook[$key] = $value;
+		}
+		else if (array_key_exists($key, $this->attPhotos))
+		{
+			$this->attPhotos[$key] = $value;
 		}
 	}
 
@@ -133,6 +159,32 @@ class FkcMe extends FkcUser {
 
 		// Do not enter in this method again
 		$this->isProfilePageInformationGet = true;
+	}
+
+	protected function getPhotoPageInformation($force = false)
+	{
+		if ($this->isPhotoPageInformationGet && !$force)
+			return;
+
+		parent::getPhotoPageInformation(FkcConfig :: getUrl('photos'));
+
+		$this->attPhotos['photos'] = $this->atts['photos'];
+
+		// Do not enter in this method again
+		$this->isPhotoPageInformationGet = true;
+	}
+
+	protected function getGuestbookPageInformation($force = false)
+	{
+		if ($this->isGuestbookPageInformationGet && !$force)
+			return;
+
+		parent::getGuestbookPageInformation(FkcConfig :: getUrl('guestbook'));
+
+		$this->attGuestbook['guestbook'] = $this->atts['guestbook'];
+
+		// Do not enter in this method again
+		$this->isGuestbookPageInformationGet = true;
 	}
 }
 ?>
